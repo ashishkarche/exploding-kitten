@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React from 'react';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+import store from './store';
+import Game from './components/Game';
+import Leaderboard from './components/Leaderboard';
 
 function App() {
+  const gameStarted = useSelector(state => state.gameStarted);
+  const gameEnded = useSelector(state => state.gameEnded);
+  const dispatch = useDispatch();
+
+  const handleStartGame = () => {
+    dispatch({ type: 'START_GAME' });
+  };
+
+  const handleDrawCard = index => {
+    dispatch({ type: 'DRAW_CARD', index });
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Exploding Kitten</h1>
+      <button onClick={handleStartGame}>Start Game</button>
+      {gameStarted && !gameEnded && <Game onDrawCard={handleDrawCard} />}
+      {gameEnded && <Leaderboard />}
     </div>
   );
 }
 
-export default App;
+const AppWithStore = () => {
+  return (
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+};
+
+export default AppWithStore;
