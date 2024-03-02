@@ -1,9 +1,8 @@
-// main.go
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -30,11 +29,11 @@ type User struct {
 }
 
 type GameState struct {
-	Username   string   `json:"username"`
-	Points     int      `json:"points"`
-	Deck       []string `json:"deck"`
-	GameStarted bool    `json:"game_started"`
-	GameEnded   bool    `json:"game_ended"`
+	Username    string   `json:"username"`
+	Points      int      `json:"points"`
+	Deck        []string `json:"deck"`
+	GameStarted bool     `json:"game_started"`
+	GameEnded   bool     `json:"game_ended"`
 }
 
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,9 +99,9 @@ func startGameHandler(w http.ResponseWriter, r *http.Request) {
 	points, _ := strconv.Atoi(val)
 
 	gameState := &GameState{
-		Username:   username,
-		Points:     points,
-		Deck:       generateDeck(),
+		Username:    username,
+		Points:      points,
+		Deck:        generateDeck(), // Assuming generateDeck() generates a deck of cards
 		GameStarted: true,
 		GameEnded:   false,
 	}
@@ -162,7 +161,7 @@ func drawCardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getLeaderboardHandler(w http.ResponseWriter, r *http.Request) {
-	// handle getting the leaderboard from Redis and returning it as JSON
+	// Fetch leaderboard from Redis and return as JSON
 }
 
 func main() {
@@ -175,9 +174,8 @@ func main() {
 	r.HandleFunc("/leaderboard", getLeaderboardHandler).Methods("GET")
 
 	srv := &http.Server{
-		Handler: r,
-		Addr:    ":8000",
-		// Good practice: enforce timeouts for servers you create!
+		Handler:      r,
+		Addr:         ":8000",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

@@ -1,39 +1,45 @@
-// Leaderboard.js
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Leaderboard = () => {
-    const username = useSelector(state => state.username);
-    const points = useSelector(state => state.points);
+  const [leaderboardData, setLeaderboardData] = useState([]);
 
-    useEffect(() => {
-        const updatePoints = async () => {
-            await axios.put(`/games/${username}`, { points });
-        };
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
 
-        updatePoints();
-    }, [username, points]);
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await axios.get('/leaderboard');
+      setLeaderboardData(response.data);
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+    }
+  };
 
-    const handleLogout = () => {
-        // handle logout logic here
-    };
-
-    const fetchLeaderboard = async () => {
-        const response = await axios.get('/games');
-        console.log(response.data);
-    };
-
-    return (
-        <div>
-            <h2>Leaderboard</h2>
-            <p>
-                Your username: <b>{username}</b> - Points: <b>{points}</b>
-            </p>
-            <button onClick={handleLogout}>Logout</button>
-            <button onClick={fetchLeaderboard}>Fetch Leaderboard</button>
-        </div>
-    );
+  return (
+    <div>
+      <h2>Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Username</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leaderboardData.map((entry, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{entry.username}</td>
+              <td>{entry.points}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default Leaderboard;
